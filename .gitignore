@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+
+# Environment files
+.env
+
+# Database
+db.sqlite3
+
+# Media and static files
+media/
+static_collected/
