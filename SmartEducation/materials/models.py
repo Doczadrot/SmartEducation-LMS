@@ -8,6 +8,9 @@ class Course(models.Model):
     description = models.TextField(blank=True, help_text='Введите описание', verbose_name='Описание курса')
     author = models.ForeignKey("users.Users",on_delete=CASCADE)
 
+    def __str__(self):
+        return self.title
+
 class Lesson(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название урока')
     preview = models.ImageField(upload_to='materials/avatar', verbose_name='AVATAR', blank=True, null=True)
