@@ -3,15 +3,17 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import SerializerMetaclass
 
 from .models import Lesson, Course
+from users.models import Pays
 
-# Сериализатор для модели Course
-class CourseSerializer(serializers.ModelSerializer):
+
+# Сериализатор для модели Lesson
+class LessonSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
+        model = Lesson
         fields = '__all__'
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-
+    lessons = LessonSerializer(many=True) #поле со списком урока
     count_lesson = SerializerMethodField() # добавляем поле количество уроков
 
     def get_count_lesson(self, instance): #описываем как будет работать count_lesson
@@ -19,10 +21,10 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = '__all__'
+        fields = ('title', ' description', 'lesson', 'count_lesson')
 
-# Сериализатор для модели Lesson
-class LessonSerializer(serializers.ModelSerializer):
+
+class PaysSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lesson
+        model = Pays
         fields = '__all__'

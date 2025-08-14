@@ -24,7 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Маршруты для приложения 'materials'
-    path('courses/', include('materials.urls'))
+    path('courses/', include('materials.urls')),
+    path('users/', include('users.urls')),
 ]
 
 # Обслуживание медиа-файлов в режиме разработки

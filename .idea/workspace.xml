@@ -5,14 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="591f5eec-2c23-4717-94c6-92faac9e276a" name="Changes" comment="Исправлено: отображение названий курсов в админке и 404 ошибка для медиафайлов">
+      <change afterPath="$PROJECT_DIR$/SmartEducation/users/filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SmartEducation/users/fixtures/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SmartEducation/users/fixtures/pays.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SmartEducation/users/serializers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SmartEducation/users/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SmartEducation/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SmartEducation/SmartEducation/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/SmartEducation/SmartEducation/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SmartEducation/SmartEducation/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/SmartEducation/SmartEducation/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SmartEducation/materials/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/SmartEducation/materials/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SmartEducation/materials/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/SmartEducation/materials/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SmartEducation/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/SmartEducation/users/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -42,6 +59,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "develop"
   }
@@ -49,7 +67,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4c141bd692a7-e2d783800521-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26927.90" />
+        <option value="bundled-python-sdk-d9fa9deec7cb-d902c0275401-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-252.23892.515" />
       </set>
     </attachedChunks>
   </component>
