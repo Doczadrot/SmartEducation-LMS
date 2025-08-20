@@ -13,7 +13,7 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True) #поле со списком урока
+    lessons = LessonSerializer(many=True, read_only=True)#поле со списком урока
     count_lesson = SerializerMethodField() # добавляем поле количество уроков
 
     def get_count_lesson(self, instance): #описываем как будет работать count_lesson
@@ -21,7 +21,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ('title', ' description', 'lesson', 'count_lesson')
+        fields = ('id', 'title', 'description', 'lessons', 'count_lesson')
 
 
 class PaysSerializer(serializers.ModelSerializer):

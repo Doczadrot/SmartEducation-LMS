@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Маршруты для приложения 'materials'
-    path('courses/', include('materials.urls')),
+    path('', include('materials.urls')),
     path('users/', include('users.urls')),
 ]
 
