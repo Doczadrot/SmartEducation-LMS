@@ -18,3 +18,14 @@ class Lesson(models.Model):
     link_video = models.URLField(help_text="Ведите ссылку", unique=True, blank=True, null=True)
     course = models.ForeignKey("materials.Course", on_delete=CASCADE) # Связь с моделью курса, к которому относится урок
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=CASCADE, verbose_name='Автор', blank=True, null=True)
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Пользователь')
+
+    course = models.ForeignKey('materials.Course', on_delete=models.CASCADE, verbose_name='Курс')
+
+    class Meta:
+        unique_together = ('user', 'course')  # Уникальное ограничение
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'

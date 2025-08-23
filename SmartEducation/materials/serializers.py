@@ -5,9 +5,14 @@ from rest_framework.serializers import SerializerMetaclass
 from .models import Lesson, Course
 from users.models import Pays
 
+from .validators import LinkValidator
+
 
 # Сериализатор для модели Lesson
 class LessonSerializer(serializers.ModelSerializer):
+
+    link_video = serializers.URLField(validators=[LinkValidator(field='link_video')], required=False)
+
     class Meta:
         model = Lesson
         fields = '__all__'
