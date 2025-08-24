@@ -1,14 +1,17 @@
+from requests import session
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import Course, Lesson, Subscription
 from .paginators import CursePaginator
-from .serializers import LessonSerializer, CourseDetailSerializer
+from .serializers import LessonSerializer, CourseDetailSerializer, SubscriptionSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from users.permissions import IsNotModerator, IsOwnerOrReadOnly, IsModeratorOrOwner
+
+from .serveces import create_stripe_price, create_stripe_pay
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -63,6 +66,8 @@ class LessonViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 class SubscriptionAPIView(APIView):
+    serializer_class = SubscriptionSerializer #для того что бы drf-spectacular прочитал наш сериализатор
+
     def post(self, request):
         user = request.user
         course_id = request.data.get('course_id')
@@ -75,3 +80,11 @@ class SubscriptionAPIView(APIView):
         except Subscription.DoesNotExist:
             Subscription.objects.create(user=user, course=course)
             return Response({'message': 'Подписка создана'}, status=201)
+
+class PaymentView(APIView):
+    def post(self, request):
+        course = get_object_or_404(Course, pk=request.data.get('course_id'))
+        #Cоздание цены
+        stripe_price = create_stripe_price(course)
+        create_stripe_pay_url =  create_stripe_pay(stripe_price.id) #Создаю оплату
+        return Response({'url': create_stripe_pay_url})#Возвращаю url клиену
