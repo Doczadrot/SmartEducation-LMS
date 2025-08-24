@@ -8,5 +8,5 @@ class LinkValidator:
 
     def __call__(self, value):
 
-        if not re.search('youtube.com', value):
+        if not re.search(r'youtube\.com', value): #если ссылка не верного формата
             raise ValidationError('Недоступный формат ссылки')

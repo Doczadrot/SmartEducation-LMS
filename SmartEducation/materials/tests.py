@@ -1,7 +1,7 @@
 from http.client import responses
 
 from django.contrib.auth.models import Group
-from django.http import response
+
 from rest_framework.test import APITestCase
 from users.models import Users
 from materials.models import Course, Lesson, Subscription
@@ -109,6 +109,27 @@ class SubScriptionTest(APITestCase):
             author=self.user
         )
         self.subscription_data = {'course_id': self.course.pk}
+
+    def test_subscription_status(self):
+        """Проверка статуса подписки пользователя на курс"""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/subscription/', self.subscription_data, format='json')
+        # Проверяем статус создания подписки
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['message'], 'Подписка создана')
+        # Повторная отправка для проверки отписк
+        response = self.client.post('/subscription/', self.subscription_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Подписка удалена')
+
+    def test_course_subscription_status(self):
+        self.client.force_authenticate(user=self.user)
+        Subscription.objects.create(user=self.user, course=self.course)
+        response = self.client.get(f'/courses/{self.course.pk}/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['is_subscribed'], True)
+
+
 
     def test_create_subscription(self):
         """Проверка возможности полписки"""
