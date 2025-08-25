@@ -21,11 +21,12 @@ class Users(AbstractUser):
 
 
 class Pays(models.Model):
+    payment_urls = models.URLField(max_length=1000, null=True, blank=True, verbose_name='Cсылка на платеж')
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
     paid_course = models.ForeignKey(Course, on_delete=CASCADE, null=True, blank=True, verbose_name='Оплаченный курс')
     paid_lesson = models.ForeignKey(Lesson, on_delete=CASCADE, null=True, blank=True, verbose_name='Оплаченный урок')
-    summ_pays = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма оплаты')
+    summ_pays = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Сумма оплаты')
     variant_pays = models.CharField(max_length=20, choices=(('chash', 'Наличные'),
                                                             ('transfer', 'Перевод')))
 

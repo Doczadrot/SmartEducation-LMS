@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from users.permissions import IsNotModerator, IsOwnerOrReadOnly, IsModeratorOrOwner
 
 from .serveces import create_stripe_price, create_stripe_pay
+from users.models import Pays
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -80,11 +81,3 @@ class SubscriptionAPIView(APIView):
         except Subscription.DoesNotExist:
             Subscription.objects.create(user=user, course=course)
             return Response({'message': 'Подписка создана'}, status=201)
-
-class PaymentView(APIView):
-    def post(self, request):
-        course = get_object_or_404(Course, pk=request.data.get('course_id'))
-        #Cоздание цены
-        stripe_price = create_stripe_price(course)
-        create_stripe_pay_url =  create_stripe_pay(stripe_price.id) #Создаю оплату
-        return Response({'url': create_stripe_pay_url})#Возвращаю url клиену

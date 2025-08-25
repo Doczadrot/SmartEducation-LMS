@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.routers import DefaultRouter
 
 from .views import PaysListAPIView, UserRegistrationViewSet, UserViewSet
+from .views import PaymentView
 
 router = DefaultRouter()
 router.register(r'register', UserRegistrationViewSet, basename='register')
@@ -16,3 +17,6 @@ urlpatterns = [
    #Маршрут регистрации
     path('', include(router.urls)),
 ]
+# Регистрируем  путь оплаты
+pay_urlpatterns = [path('payment/', PaymentView.as_view(), name='payment-view')]
+urlpatterns += pay_urlpatterns
