@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from datetime import timedelta
 from os import path, getenv
+import environ
 
 import stripe
 from dotenv import load_dotenv
 
 load_dotenv()
+env = environ.Env()
+environ.Env.read_env()
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -160,3 +163,19 @@ AUTH_USER_MODEL = 'users.Users'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = path.join(BASE_DIR, 'media')
+
+# Celery
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+
+CELERY_BEAT_SCHEDULE = {
+    'say_hello_every_10_seconds': {
+        'task': 'materials.tasks.test_message',
+        'schedule': 10.0,
+    },
+}

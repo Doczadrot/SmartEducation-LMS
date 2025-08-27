@@ -16,8 +16,8 @@ class Users(AbstractUser):
     avatar = models.ImageField(upload_to='users/avatar',verbose_name='AVATAR', blank=True, null=True)
     groups = models.ManyToManyField('auth.Group',blank=True,
     help_text='Группы, к которым принадлежит этот пользователь. Пользователь получит все права, предоставленные каждой из его групп',
-        related_name="customuser_set",  # Важно для избежания конфликтов related_name
-        related_query_name="customuser")
+        related_name="customuser_set", related_query_name="customuser")
+    last_login = models.DateTimeField(auto_now=True, verbose_name='Последняя активность')
 
 
 class Pays(models.Model):

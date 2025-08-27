@@ -1,24 +1,24 @@
-from requests import session
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
 from .models import Course, Lesson, Subscription
 from .paginators import CursePaginator
 from .serializers import LessonSerializer, CourseDetailSerializer, SubscriptionSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
 from users.permissions import IsNotModerator, IsOwnerOrReadOnly, IsModeratorOrOwner
-
-from .serveces import create_stripe_price, create_stripe_pay
 from users.models import Pays
+from .tasks import subscription_course_mail
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseDetailSerializer
     pagination_class = CursePaginator
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        subscription_course_mail.delay(instance.id)
 
     def get_permissions(self):
         # Разрешаем просмотр списка и отдельного объекта всем
