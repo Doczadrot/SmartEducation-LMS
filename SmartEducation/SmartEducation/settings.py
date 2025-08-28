@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os
 from datetime import timedelta
 from os import path, getenv
 import environ
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'django_celery_beat',
 ]
 
 REST_FRAMEWORK = {
@@ -173,9 +175,22 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
 
-CELERY_BEAT_SCHEDULE = {
-    'say_hello_every_10_seconds': {
-        'task': 'materials.tasks.test_message',
-        'schedule': 10.0,
+ELERY_BEAT_SCHEDULE = {
+    'deactivate-inactive-users': {
+        'task': 'materials.tasks.deactivate_users',
+    },
+    'delete-deactivated-users': {
+        'task': 'materials.tasks.delete_deactivated_users',
+        'schedule': timedelta(days=60),
     },
 }
+
+
+# Настройки почтового сервиса
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
+

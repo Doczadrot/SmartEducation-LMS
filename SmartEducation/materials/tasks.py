@@ -1,48 +1,60 @@
-import logging
+
 from datetime import timedelta
-
+from django.conf import settings
 from celery import shared_task
-from celery.utils.time import timezone
+from django.utils import timezone
 from django.core.mail import send_mail
-from .models import Course, Subscription
-from users.models import Users
+from django.contrib.auth import get_user_model
+from materials.models import Course, Subscription
 
-logger = logging.getLogger(__name__)
-
-@shared_task #декоратор  который превращает обычную функцию в задачу Celery
-def subscription_course_mail(course_id):
-    """Находим емайлы подписчиков"""
-
-    course = Course.objects.get(id=course_id)
-    list_subscribs = Subscription.objects.filter(course=course)
-    subscription_mail = [subscription.user.email for subscription in list_subscribs]
-
-    send_emails.delay(subscription_mail) # Отложеный вызов двух функций ч
 
 @shared_task
-def send_emails(subscription_mail):
-    """"Функция отправки сообщенний"""
-    # Встроеная функция джанго
-    send_mail('Обновление курса', 'Курс обновлён.', 'admin@example.com', subscription_mail)
+def subscription_course_mail(course_id, course_title):
+    try:
+        subscriptions = Subscription.objects.filter(course=course_id)
+        if not subscriptions.exists():
+            print(f"Подписок не найдено для курса с ID: {course_id}")
+            return
 
-@shared_task
-def test_message():
-    message = "Привет это тестовая функция"
-    logger.info(message)
-    print(message)
-    return message
+        for subscription in subscriptions:
+            email_address = subscription.user.email
+            subject = f"Обновление курса: {course_title}"
+            message = f"Здравствуйте, {subscription.user.username}!\n\nКурс '{course_title}' был обновлен."
+
+            print(f"Отправка письма на: {email_address} для курса: {course_title}")
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [email_address],
+                fail_silently=False
+            )
+
+    except Exception as e:
+        print(f"Произошла ошибка в subscription_course_mail: {e}")
+
 
 @shared_task
 def deactivate_users():
-    """Функция удаление неактивных пользователей"""
-    now_data = timezone.now()
-    thirty_days = timedelta(days=30)
-    date_month_ago = now_data - thirty_days
+    """Задача для деактивации неактивных пользователей"""
+    User = get_user_model()
+    thirty_days_ago = timezone.now() - timedelta(days=30)
 
-    inactive_users = Users.objects.filter(last_login__lt=date_month_ago) #выявили пользователей
-    # Получаем список пользователей, которых нужно заблокировать
-    for user in inactive_users:
-        user.is_active = False
-        user.save()
+    deactivated_count = User.objects.filter(last_login__lt=thirty_days_ago, is_active=True).update(is_active=False)
+
+    print(f"--- Запуск задачи: deactivate_users ---")
+    print(f"--- Задача завершена. Деактивировано {deactivated_count} пользователей. ---")
 
 
+@shared_task
+def delete_deactivated_users():
+    """Функция для полного удаления пользователей заходили более 60 дней."""
+    print("--- Запуск задачи: delete_deactivated_users ---")
+    User = get_user_model()
+    sixty_days_ago = timezone.now() - timedelta(days=60)
+
+    users_to_delete = User.objects.filter(last_login__lt=sixty_days_ago, is_active=False)
+    deleted_count = users_to_delete.count()
+    users_to_delete.delete()
+
+    print(f"--- Задача завершена. Удалено {deleted_count} пользователей. ---")
