@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  web:
+    build: . # Где хранится приложение? в той же самой папке где и докерфайл - .
+    volumes:
+      - .:/app # Говорим докеру - подключи файл
+    ports:
+      - "8000:8000" # Открываем порт
+    env_file: .env # откуда берем секретные данные
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
