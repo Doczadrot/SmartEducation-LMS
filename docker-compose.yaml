@@ -2,21 +2,55 @@ version: '3.9'
 
 services:
   web:
-    build: . # Где хранится приложение? в той же самой папке где и докерфайл - .
-    volumes:
-      - .:/app # Говорим докеру - подключи файл
+    build: .
     ports:
-      - "8000:8000" # Открываем порт
-    env_file: .env # откуда берем секретные данные
+      - "8000:8000"
+    env_file: .env
     depends_on:
       - db
+      - redis
+    networks:
+      - my_network
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
   db:
-    image: postgres
+    image: postgres:15
     env_file:
       - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - my_network
+
+  celery:
+    build: .
+    env_file: .env
+    depends_on:
+      - redis
+      - db
+    command: celery -A SmartEducation worker --loglevel=info
+    networks:
+      - my_network
+
+  celery-beat:
+    build: .
+    env_file: .env
+    depends_on:
+      - redis
+      - db
+    command: celery -A SmartEducation beat --loglevel=info
+    networks:
+      - my_network
 
 volumes:
   postgres_data:
+
+networks:
+  my_network:

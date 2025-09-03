@@ -9,7 +9,4 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 #Копируем остальной функционал
-COPY .
-
-#Запускаем весь проект
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+COPY SmartEducation/ .
