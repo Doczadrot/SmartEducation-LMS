@@ -14,9 +14,9 @@
 
 ## 🌐 Демо
 
-- **Приложение:** http://your-server-ip:8000
-- **Админка:** http://your-server-ip:8000/admin/
-- **API Documentation:** http://your-server-ip:8000/api/docs/
+- **Приложение:** http://your-server-ip:8000          1
+- **Админка:** http://your-server-ip:8000/admin/        
+- **API Documentation:** http://your-server-ip:8000/api/docs/        
 
 📦 Установка и запуск
 Запуск с помощью Docker Compose
