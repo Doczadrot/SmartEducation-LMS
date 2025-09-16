@@ -10,7 +10,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    
+
     # Нужны базы данных для тестов
     services:
       postgres:
@@ -20,7 +20,7 @@ jobs:
           POSTGRES_DB: test_smarteducation
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:latest
         ports:
@@ -55,7 +55,6 @@ jobs:
         python manage.py migrate
         python manage.py test
 
-
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -72,11 +71,26 @@ jobs:
 
     - name:  Создаем архив
       run: |
-        tar --exclude='.git' \
-            --exclude='__pycache__' \
-            --exclude='*.pyc' \
-            --exclude='.env' \
-            -czf smarteducation.tar.gz .
+        # Создаем чистую копию для архивации
+        mkdir -p build_temp
+        rsync -av \
+          --exclude='.git' \
+          --exclude='__pycache__' \
+          --exclude='*.pyc' \
+          --exclude='.env' \
+          --exclude='.github' \
+          --exclude='node_modules' \
+          --exclude='.DS_Store' \
+          --exclude='*.log' \
+          --exclude='*.tar.gz' \
+          --exclude='.pytest_cache' \
+          --exclude='htmlcov' \
+          ./ build_temp/
+        
+        # Создаем архив из временной директории
+        cd build_temp
+        tar -czf ../smarteducation.tar.gz .
+        cd ..
 
     - name:  Деплоим на сервер
       env:
@@ -89,7 +103,7 @@ jobs:
       run: |
         # Копируем архив на сервер
         scp -o StrictHostKeyChecking=no smarteducation.tar.gz $SERVER_USER@$SERVER_HOST:/tmp/
-
+  
         # Развертываем на сервере
         ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
           echo " Начинаем деплой..."
@@ -141,3 +155,7 @@ jobs:
           
           echo " Деплой завершен!"
         EOF
+
+    - name:  Очищаем временные файлы
+      run: |
+        rm -rf build_temp smarteducation.tar.gz
