@@ -1,0 +1,152 @@
+
+name: Test and Deploy
+
+
+on:
+  push:
+    branches: [ main, develop ]    # При загрузке в основные ветки
+  pull_request:
+    branches: [ main ]             # При создании PR в main
+
+jobs:
+  # 🧪 Шаг 1: Тестирование
+  test:
+    runs-on: ubuntu-latest
+    
+    # Нужны базы данных для тестов
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_smarteducation
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+
+    - name:  Скачиваем код
+      uses: actions/checkout@v4
+
+    # Устанавливаем Python
+    - name: 🐍 Устанавливаем Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Устанавливаем зависимости
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Запускаем тесты
+    - name: 🧪 Запускаем тесты
+      env:
+        SECRET_KEY: 'test-key-for-github-actions'
+        DEBUG: 'False'
+        POSTGRES_DB: test_smarteducation
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        DB_HOST: localhost
+        DB_PORT: 5432
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        cd SmartEducation
+        python manage.py migrate
+        python manage.py test
+
+
+  deploy:
+    needs: test                    
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Только для main ветки
+
+    steps:
+    # Скачиваем код
+    - name: Скачиваем код
+      uses: actions/checkout@v4
+
+    # Настраиваем SSH ключ
+    - name: 🔑 Настраиваем SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    # Создаем архив проекта
+    - name: 📦 Создаем архив
+      run: |
+        tar --exclude='.git' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='.env' \
+            -czf smarteducation.tar.gz .
+
+    - name:  Деплоим на сервер
+${{ secrets.POSTGRES_PASSWORD }}      env:
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: 
+      run: |
+        # Копируем архив на сервер
+        scp -o StrictHostKeyChecking=no smarteducation.tar.gz $SERVER_USER@$SERVER_HOST:/tmp/
+
+        # Развертываем на сервере
+        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
+          echo "🚀 Начинаем деплой..."
+          
+          # Останавливаем приложение
+          sudo systemctl stop smarteducation || true
+          
+          # Создаем бэкап
+          if [ -d "/home/ubuntu/SmartEducation" ]; then
+            sudo cp -r /home/ubuntu/SmartEducation /home/ubuntu/SmartEducation.backup
+          fi
+          
+          # Распаковываем новую версию
+          cd /home/ubuntu
+          rm -rf SmartEducation_new
+          mkdir SmartEducation_new
+          cd SmartEducation_new
+          tar -xzf /tmp/smarteducation.tar.gz
+          
+          # Создаем .env файл
+          cat > .env << ENV_EOF
+        SECRET_KEY=$SECRET_KEY
+        DEBUG=False
+        ALLOWED_HOSTS=$SERVER_HOST,localhost,127.0.0.1
+        POSTGRES_DB=$POSTGRES_DB
+        POSTGRES_USER=$POSTGRES_USER
+        POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+        DB_HOST=localhost
+        DB_PORT=5432
+        REDIS_URL=redis://localhost:6379/0
+        ENV_EOF
+          
+          # Устанавливаем зависимости и мигрируем
+          source /home/ubuntu/venv/bin/activate
+          pip install -r requirements.txt
+          cd SmartEducation
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+          
+          # Заменяем старую версию
+          cd /home/ubuntu
+          if [ -d "SmartEducation" ]; then
+            rm -rf SmartEducation
+          fi
+          mv SmartEducation_new SmartEducation
+          
+          # Запускаем приложение
+          sudo systemctl start smarteducation
+          
+          echo "✅ Деплой завершен!"
+        EOF
+

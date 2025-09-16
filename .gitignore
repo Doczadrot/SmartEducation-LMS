@@ -201,3 +201,55 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# SmartEducation project specific
+# Временные и логи
+*.log
+server.log
+access.log
+error.log
+celerybeat.pid
+smarteducation.pid
+
+# Django collected static files
+staticfiles/
+static_root/
+
+# Media uploads
+media/
+
+# Database backups
+*.backup
+*.sql.gz
+*.dump
+
+# Deployment scripts local copies
+deploy_local/
+
+# Мониторинг и метрики
+monitoring/
+metrics/
+
+# SSL сертификаты
+*.pem
+*.key
+*.crt
+*.csr
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Тестовые файлы
+test_uploads/
+test_media/
+
+# Локальные конфигурации
+local_settings.py
+settings_local.py
+# Секретные документы и внутренние материалы
+docs/
+*.pdf
