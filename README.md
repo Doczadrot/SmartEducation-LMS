@@ -232,3 +232,4 @@ sudo systemctl start smarteducation
 
 - Создайте [Issue](https://github.com/Doczadrot/SmartEducation-LMS/issues)
 - Проверьте [Wiki](https://github.com/Doczadrot/SmartEducation-LMS/wiki) с дополнительной документацией# SSH Deploy Test
+# Тест нового SSH ключа
