@@ -64,6 +64,13 @@ jobs:
     - name:  Скачиваем код
       uses: actions/checkout@v4
 
+    - name: Добавляем сервер в known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts      
+
     - name:  Настраиваем SSH
       uses: webfactory/ssh-agent@v0.8.0
       with:
