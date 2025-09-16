@@ -40,8 +40,8 @@ docker-compose up --build
 docker-compose exec web python manage.py migrate
 docker-compose exec web python manage.py createsuperuser
 
-После запуска проект будет доступен по адресу:
-http://127.0.0.1:8000/
+После запуска проект будет доступен по адресу: ******
+http://127.0.0.1:8000/    
 
 ⚙️ Файлы Docker
 Dockerfile: Содержит инструкции для сборки образа Django-приложения. Он устанавливает зависимости из requirements.txt и настраивает окружение.
